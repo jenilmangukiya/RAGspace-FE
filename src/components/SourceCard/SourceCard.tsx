@@ -29,7 +29,15 @@ export const SourceCard: React.FC<SourceCardProps> = ({ source, documentName, on
             {documentName}
           </p>
           <p className="text-[10px] text-zinc-500 mt-0.5">
-            Chunk Index: <span className="font-semibold text-zinc-400">{source.chunk_index}</span>
+            {source.page_number !== undefined ? (
+              <>
+                Page <span className="font-semibold text-zinc-400">{source.page_number}</span>
+              </>
+            ) : (
+              <>
+                Reference: <span className="font-semibold text-zinc-400">{source.chunk_index + 1}</span>
+              </>
+            )}
           </p>
         </div>
       </div>

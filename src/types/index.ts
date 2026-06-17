@@ -30,6 +30,7 @@ export interface ChatSource {
   document_id: string;
   chunk_index: number;
   score: number;
+  page_number?: number;
 }
 
 export interface ChatResponse {

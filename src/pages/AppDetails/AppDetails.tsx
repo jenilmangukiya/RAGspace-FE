@@ -185,11 +185,21 @@ export const AppDetails: React.FC = () => {
                 <p className="text-sm font-semibold text-white break-all">{selectedSource.docName}</p>
               </div>
 
-              {/* Chunk index */}
+              {/* Page Number */}
+              {selectedSource.source.page_number !== undefined && (
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Page Number</span>
+                  <p className="text-sm font-medium text-zinc-300">
+                    Page: <span className="font-semibold text-zinc-100">{selectedSource.source.page_number}</span>
+                  </p>
+                </div>
+              )}
+
+              {/* Reference ID */}
               <div className="space-y-1">
-                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Indexed Chunk</span>
+                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Reference ID</span>
                 <p className="text-sm font-medium text-zinc-300">
-                  Chunk Index: <span className="font-semibold text-zinc-100">{selectedSource.source.chunk_index}</span>
+                  Reference: <span className="font-semibold text-zinc-100">{selectedSource.source.chunk_index + 1}</span>
                 </p>
               </div>
 
@@ -206,7 +216,7 @@ export const AppDetails: React.FC = () => {
 
               {/* Notice */}
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4 mt-6 text-xs text-zinc-400 leading-relaxed">
-                This document chunk was dynamically retrieved from the Qdrant vector database using embeddings matching your chat question's semantic context.
+                This document section was dynamically retrieved from the Qdrant vector database using embeddings matching your chat question's semantic context.
               </div>
             </div>
 
