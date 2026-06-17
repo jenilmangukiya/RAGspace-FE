@@ -1,31 +1,12 @@
 import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { chatApi, SendMessagePayload } from '../api/chat.api';
+import { chatApi } from '../api/chat.api';
 import { ChatMessage, ChatSource } from '../types';
 import { toast } from 'sonner';
 
 export const useChat = (appId: string | undefined) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [lastSources, setLastSources] = useState<ChatSource[]>([]);
-
-  // Send message mutation
-  const chatMutation = useMutation({
-    mutationFn: (payload: SendMessagePayload) => chatApi.sendMessage(payload),
-    onSuccess: (response) => {
-      // Append assistant response to messages
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: response.answer },
-      ]);
-      setLastSources(response.sources || []);
-    },
-    onError: (error: any) => {
-      const msg = error.response?.data?.detail || error.message || 'Failed to send message';
-      toast.error(msg);
-      // Remove last user message on error so they can try again
-      setMessages((prev) => prev.slice(0, -1));
-    },
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const sendMessage = async (text: string) => {
     if (!appId) {
@@ -36,16 +17,64 @@ export const useChat = (appId: string | undefined) => {
 
     // 1. Append user message locally
     const userMessage: ChatMessage = { role: 'user', content: text };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    setMessages((prev) => [...prev, userMessage]);
     setLastSources([]); // Clear previous sources until new response arrives
+    setIsLoading(true);
 
-    // 2. Trigger mutation with full history context
-    await chatMutation.mutateAsync({
-      app_id: appId,
-      query: text,
-      history: messages, // Send history (excluding the current user message just added, as backend takes query + history separately)
-    });
+    // 2. Add assistant placeholder message that we will stream tokens into
+    let currentAssistantMessage = '';
+    setMessages((prev) => [
+      ...prev,
+      { role: 'assistant', content: '' },
+    ]);
+
+    await chatApi.streamMessage(
+      {
+        app_id: appId,
+        query: text,
+        history: messages, // Send history (excluding the current user message just added)
+      },
+      {
+        onToken: (token) => {
+          currentAssistantMessage += token;
+          setMessages((prev) => {
+            const updated = [...prev];
+            if (updated.length > 0) {
+              const lastIndex = updated.length - 1;
+              if (updated[lastIndex].role === 'assistant') {
+                updated[lastIndex] = {
+                  ...updated[lastIndex],
+                  content: currentAssistantMessage,
+                };
+              }
+            }
+            return updated;
+          });
+        },
+        onSources: (sources) => {
+          setLastSources(sources || []);
+        },
+        onDone: () => {
+          setIsLoading(false);
+        },
+        onError: (error) => {
+          const msg = error.message || 'Failed to send message';
+          toast.error(msg);
+          setIsLoading(false);
+          // Rollback: Remove the last assistant message and user message on failure
+          setMessages((prev) => {
+            const updated = [...prev];
+            if (updated.length > 0 && updated[updated.length - 1].role === 'assistant') {
+              updated.pop();
+            }
+            if (updated.length > 0 && updated[updated.length - 1].role === 'user') {
+              updated.pop();
+            }
+            return updated;
+          });
+        },
+      }
+    );
   };
 
   const clearChat = () => {
@@ -57,7 +86,7 @@ export const useChat = (appId: string | undefined) => {
     messages,
     sendMessage,
     clearChat,
-    isLoading: chatMutation.isPending,
+    isLoading,
     sources: lastSources,
   };
 };

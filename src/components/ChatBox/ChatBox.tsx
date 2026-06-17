@@ -84,26 +84,11 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
               sources={i === messages.length - 1 && msg.role === 'assistant' ? sources : []}
               documents={documents}
               onSourceClick={onSourceClick}
+              isLoading={isLoading && i === messages.length - 1}
             />
           ))
         )}
 
-        {/* Typing State Indicator */}
-        {isLoading && (
-          <div className="flex gap-4 py-6 px-4 md:px-6 bg-zinc-900/10">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-indigo-800 bg-indigo-950 text-indigo-400">
-              <Sparkles className="h-4 w-4 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-1.5 pt-1.5">
-              <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">Assistant</span>
-              <div className="flex items-center gap-1 mt-1 bg-zinc-800/40 border border-zinc-800 px-3 py-2.5 rounded-2xl rounded-tl-xs">
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
-                <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-bounce" />
-              </div>
-            </div>
-          </div>
-        )}
         <div ref={messagesEndRef} />
       </div>
 
