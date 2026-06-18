@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { chatApi } from '../api/chat.api';
 import { conversationsApi } from '../api/conversations.api';
 import { ChatMessage, ChatSource, Conversation } from '../types';
@@ -12,33 +12,42 @@ export const useChat = (appId: string | undefined) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConversationsLoading, setIsConversationsLoading] = useState(false);
 
-  const fetchConversations = async () => {
+  const fetchConversations = useCallback(async () => {
     if (!appId) return;
     setIsConversationsLoading(true);
     try {
       const data = await conversationsApi.getConversations(appId);
       setConversations(data);
-    } catch (err) {
+    } catch {
       toast.error('Failed to load conversations');
     } finally {
       setIsConversationsLoading(false);
     }
-  };
+  }, [appId]);
+
+  const resetActiveChat = useCallback(() => {
+    setActiveConversationId(null);
+    setMessages([]);
+    setLastSources([]);
+  }, []);
+
+  const clearConversations = useCallback(() => {
+    setConversations([]);
+  }, []);
 
   useEffect(() => {
-    if (appId) {
-      fetchConversations();
-      // Reset active conversation when appId changes
-      setActiveConversationId(null);
-      setMessages([]);
-      setLastSources([]);
-    } else {
-      setConversations([]);
-      setActiveConversationId(null);
-      setMessages([]);
-      setLastSources([]);
-    }
-  }, [appId]);
+    const initData = async () => {
+      await Promise.resolve();
+      if (appId) {
+        fetchConversations();
+        resetActiveChat();
+      } else {
+        clearConversations();
+        resetActiveChat();
+      }
+    };
+    initData();
+  }, [appId, fetchConversations, resetActiveChat, clearConversations]);
 
   const selectConversation = async (conversationId: string | null) => {
     if (!conversationId) {
@@ -52,14 +61,14 @@ export const useChat = (appId: string | undefined) => {
     try {
       const data = await conversationsApi.getConversation(conversationId);
       setActiveConversationId(conversationId);
-      // Map and ensure proper ChatMessage formatting
-      const chatMessages: ChatMessage[] = (data.messages || []).map((m: any) => ({
+      
+      const chatMessages: ChatMessage[] = (data.messages || []).map((m: { role: string; content: string }) => ({
         role: m.role as 'user' | 'assistant',
         content: m.content,
       }));
       setMessages(chatMessages);
       setLastSources([]);
-    } catch (err) {
+    } catch {
       toast.error('Failed to load conversation history');
     } finally {
       setIsLoading(false);
@@ -101,23 +110,22 @@ export const useChat = (appId: string | undefined) => {
 
       await chatApi.streamMessage(
         {
-          app_id: appId,
+          app_id: appId as string,
           query: text,
-          conversation_id: convoId,
+          conversation_id: convoId as string,
         },
         {
           onToken: (token) => {
             currentAssistantMessage += token;
             setMessages((prev) => {
               const updated = [...prev];
-              if (updated.length > 0) {
-                const lastIndex = updated.length - 1;
-                if (updated[lastIndex].role === 'assistant') {
-                  updated[lastIndex] = {
-                    ...updated[lastIndex],
-                    content: currentAssistantMessage,
-                  };
-                }
+              const lastIndex = updated.length - 1;
+              const lastMsg = lastIndex >= 0 ? updated[lastIndex] : null;
+              if (lastMsg && lastMsg.role === 'assistant') {
+                updated[lastIndex] = {
+                  ...lastMsg,
+                  content: currentAssistantMessage,
+                };
               }
               return updated;
             });
@@ -139,10 +147,12 @@ export const useChat = (appId: string | undefined) => {
             // Rollback on failure
             setMessages((prev) => {
               const updated = [...prev];
-              if (updated.length > 0 && updated[updated.length - 1].role === 'assistant') {
+              const lastIdx = updated.length - 1;
+              if (lastIdx >= 0 && updated[lastIdx]?.role === 'assistant') {
                 updated.pop();
               }
-              if (updated.length > 0 && updated[updated.length - 1].role === 'user') {
+              const newLastIdx = updated.length - 1;
+              if (newLastIdx >= 0 && updated[newLastIdx]?.role === 'user') {
                 updated.pop();
               }
               return updated;
@@ -150,8 +160,9 @@ export const useChat = (appId: string | undefined) => {
           },
         }
       );
-    } catch (err: any) {
-      toast.error(err.message || 'Failed to initialize conversation');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to initialize conversation';
+      toast.error(msg);
       setIsLoading(false);
     }
   };
@@ -164,7 +175,7 @@ export const useChat = (appId: string | undefined) => {
         selectConversation(null);
       }
       toast.success('Conversation deleted');
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete conversation');
     }
   };
@@ -177,7 +188,7 @@ export const useChat = (appId: string | undefined) => {
         prev.map((c) => (c.id === conversationId ? { ...c, title: updated.title } : c))
       );
       toast.success('Conversation renamed');
-    } catch (err) {
+    } catch {
       toast.error('Failed to rename conversation');
     }
   };
