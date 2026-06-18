@@ -48,3 +48,13 @@ export interface SearchResult {
 export interface SearchResponse {
   results: SearchResult[];
 }
+
+export interface Conversation {
+  id: string;
+  app_id: string;
+  user_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  messages?: ChatMessage[];
+}

@@ -16,10 +16,21 @@ export const AppDetails: React.FC = () => {
   const { useAppQuery } = useApps();
   const { data: app, isLoading: isAppLoading } = useAppQuery(appId);
   const { documents, isLoading: isDocsLoading, uploadDocument, isUploading, deleteDocument } = useDocuments(appId);
-  const { messages, sendMessage, isLoading: isChatLoading, sources } = useChat(appId);
+  const {
+    messages,
+    sendMessage,
+    isLoading: isChatLoading,
+    sources,
+    conversations,
+    activeConversationId,
+    selectConversation,
+    deleteConversation,
+    renameConversation,
+    isConversationsLoading,
+  } = useChat(appId);
 
   // Responsive active tab state for mobile/tablet screens
-  const [activeTab, setActiveTab] = useState<'docs' | 'chat'>('docs');
+  const [activeTab, setActiveTab] = useState<'docs' | 'chat'>('chat');
   
   // Drawer state to view details of the clicked citation source card
   const [selectedSource, setSelectedSource] = useState<{ source: ChatSource; docName: string } | null>(null);
@@ -100,10 +111,33 @@ export const AppDetails: React.FC = () => {
 
       {/* Workspace panel layout */}
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
-        {/* Left Side: Documents */}
+        {/* Left Side: AI Chat Section */}
         <section
           className={clsx(
-            'lg:col-span-5 flex flex-col gap-6 min-h-0',
+            'lg:col-span-8 flex flex-col min-h-0 h-full',
+            activeTab === 'chat' ? 'flex' : 'hidden lg:flex'
+          )}
+        >
+          <ChatBox
+            messages={messages}
+            sources={sources}
+            documents={documents}
+            onSendMessage={sendMessage}
+            isLoading={isChatLoading}
+            onSourceClick={handleSourceClick}
+            conversations={conversations}
+            activeConversationId={activeConversationId}
+            onSelectConversation={selectConversation}
+            onDeleteConversation={deleteConversation}
+            onRenameConversation={renameConversation}
+            isConversationsLoading={isConversationsLoading}
+          />
+        </section>
+
+        {/* Right Side: Documents */}
+        <section
+          className={clsx(
+            'lg:col-span-4 flex flex-col gap-6 min-h-0',
             activeTab === 'docs' ? 'flex' : 'hidden lg:flex'
           )}
         >
@@ -136,23 +170,6 @@ export const AppDetails: React.FC = () => {
               )}
             </div>
           </div>
-        </section>
-
-        {/* Right Side: AI Chat Section */}
-        <section
-          className={clsx(
-            'lg:col-span-7 flex flex-col min-h-0 h-full',
-            activeTab === 'chat' ? 'flex' : 'hidden lg:flex'
-          )}
-        >
-          <ChatBox
-            messages={messages}
-            sources={sources}
-            documents={documents}
-            onSendMessage={sendMessage}
-            isLoading={isChatLoading}
-            onSourceClick={handleSourceClick}
-          />
         </section>
       </div>
 

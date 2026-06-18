@@ -1,11 +1,11 @@
 import { api, baseURL } from './axios';
 import { supabase } from '../services/supabase';
-import { ChatMessage, ChatResponse, SearchResponse, ChatSource } from '../types';
+import { ChatResponse, SearchResponse, ChatSource } from '../types';
 
 export interface SendMessagePayload {
   app_id: string;
   query: string;
-  history: ChatMessage[];
+  conversation_id: string;
 }
 
 export interface StreamMessageCallbacks {

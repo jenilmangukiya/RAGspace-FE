@@ -83,7 +83,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         {!isUser && sources.length > 0 && (
           <div className="pt-4 border-t border-zinc-900/80">
             <p className="text-xs font-semibold text-zinc-500 mb-3">Sources Used</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="flex flex-wrap gap-3">
               {sources.map((src, i) => (
                 <SourceCard
                   key={i}
