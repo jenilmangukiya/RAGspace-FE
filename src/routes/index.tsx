@@ -5,6 +5,7 @@ import Login from '../pages/Auth/Login';
 import Signup from '../pages/Auth/Signup';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import AppDetails from '../pages/AppDetails/AppDetails';
+import Landing from '../pages/Landing/Landing';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -30,10 +31,10 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  // Root path landing redirection
+  // Root path landing page
   {
     path: '/',
-    element: <Navigate to="/dashboard" replace />,
+    element: <Landing />,
   },
 ]);
 export default router;

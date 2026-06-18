@@ -44,7 +44,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-500">
               <span className="font-bold text-white text-sm">R</span>
             </div>
-            <span className="font-bold text-white tracking-tight text-lg">RAG Space</span>
+            <span className="font-extrabold tracking-tight text-lg text-white">
+              RAG<span className="gradient-text">Space</span>
+            </span>
           </Link>
           <button
             className="rounded-lg p-1 text-zinc-400 hover:bg-zinc-800 hover:text-white md:hidden"

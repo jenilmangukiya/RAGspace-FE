@@ -65,6 +65,10 @@
   scrollbar-color: hsl(240 3.7% 25%) transparent;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
