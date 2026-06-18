@@ -46,6 +46,9 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
   // Inline renaming state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  
+  // Delete confirmation state
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     messagesEndRef.current?.scrollIntoView({ behavior });
@@ -223,7 +226,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            onDeleteConversation?.(convo.id);
+                            setDeleteConfirmId(convo.id);
                           }}
                           className="p-1 rounded-md text-zinc-500 hover:text-rose-450 hover:bg-zinc-800 transition-colors cursor-pointer"
                           title="Delete chat"
@@ -314,6 +317,39 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
         </div>
 
       </div>
+
+      {/* Delete Conversation Confirmation Modal */}
+      {deleteConfirmId && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="glass-panel w-full max-w-sm rounded-2xl p-5 shadow-2xl relative z-10 flex flex-col gap-4 animate-in fade-in duration-200">
+            <h3 className="text-sm font-bold text-white">Delete Chat</h3>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              Are you sure you want to delete this conversation? This action cannot be undone and will delete all messages.
+            </p>
+            <div className="flex justify-end gap-2.5 mt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteConfirmId(null)}
+                className="px-3.5 py-2 text-xs font-semibold rounded-xl border border-zinc-850 text-zinc-400 hover:text-white hover:bg-zinc-900/50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (onDeleteConversation && deleteConfirmId) {
+                    onDeleteConversation(deleteConfirmId);
+                  }
+                  setDeleteConfirmId(null);
+                }}
+                className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-xs transition-colors cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
