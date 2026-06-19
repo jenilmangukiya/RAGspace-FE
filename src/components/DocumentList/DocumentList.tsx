@@ -1,17 +1,18 @@
 import React from 'react';
 import { FileText, Trash2, CheckCircle2, Loader2, AlertTriangle, FileClock } from 'lucide-react';
 import { Document, DocumentStatus } from '../../types';
+import { clsx } from 'clsx';
 
 export interface DocumentListProps {
   documents: Document[];
   onDelete: (id: string) => void;
-  isDeleting?: boolean;
+  deletingId?: string | null;
 }
 
 export const DocumentList: React.FC<DocumentListProps> = ({
   documents,
   onDelete,
-  isDeleting,
+  deletingId,
 }) => {
   const getStatusBadge = (status: DocumentStatus) => {
     switch (status) {
@@ -103,11 +104,18 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               {getStatusBadge(doc.status)}
               <button
                 onClick={(e) => handleDelete(doc.id, doc.file_name, e)}
-                disabled={isDeleting}
-                className="rounded-lg p-1.5 text-zinc-500 hover:bg-red-950/20 hover:text-red-400 transition-colors disabled:opacity-50 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                disabled={!!deletingId}
+                className={clsx(
+                  'rounded-lg p-1.5 text-zinc-500 hover:bg-red-950/20 hover:text-red-400 transition-colors disabled:opacity-50 focus:opacity-100 flex items-center justify-center min-w-[28px] min-h-[28px]',
+                  deletingId === doc.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                )}
                 title="Delete Document"
               >
-                <Trash2 className="h-4 w-4" />
+                {deletingId === doc.id ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-indigo-400" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>

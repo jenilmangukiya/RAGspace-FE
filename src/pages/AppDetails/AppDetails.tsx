@@ -15,7 +15,7 @@ export const AppDetails: React.FC = () => {
   const { appId } = useParams<{ appId: string }>();
   const { useAppQuery } = useApps();
   const { data: app, isLoading: isAppLoading } = useAppQuery(appId);
-  const { documents, isLoading: isDocsLoading, uploadDocument, isUploading, deleteDocument } = useDocuments(appId);
+  const { documents, isLoading: isDocsLoading, uploadDocument, isUploading, deleteDocument, deletingId } = useDocuments(appId);
   const {
     messages,
     sendMessage,
@@ -166,7 +166,7 @@ export const AppDetails: React.FC = () => {
                   <Loader size="md" />
                 </div>
               ) : (
-                <DocumentList documents={documents} onDelete={deleteDocument} />
+                <DocumentList documents={documents} onDelete={deleteDocument} deletingId={deletingId} />
               )}
             </div>
           </div>

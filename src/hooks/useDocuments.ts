@@ -70,5 +70,6 @@ export const useDocuments = (appId: string | undefined) => {
     isUploading: uploadMutation.isPending,
     deleteDocument: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isPending,
+    deletingId: deleteMutation.isPending ? deleteMutation.variables : null,
   };
 };
