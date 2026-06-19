@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useApps } from '../../hooks/useApps';
+import { useAuth } from '../../hooks/useAuth';
 import AppCard from '../../components/AppCard';
 import EmptyState from '../../components/EmptyState';
 import { Loader } from '../../components/Loader';
-import { Search, Plus, FolderPlus, X, Loader2 } from 'lucide-react';
+import { Search, Plus, FolderPlus, X, Loader2, Sparkles } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const { apps, isLoading, createApp, deleteApp, isCreating } = useApps();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newAppName, setNewAppName] = useState('');
@@ -40,7 +42,21 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
       <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Upper header section */}
+        {user?.email === (import.meta.env.VITE_DEMO_EMAIL || 'demo@demo.com') && (
+          <div className="flex items-start gap-4 rounded-2xl border border-indigo-500/20 bg-indigo-950/10 p-5 shadow-lg shadow-indigo-500/5 backdrop-blur-md">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <h4 className="text-sm font-bold text-white">Logged in to Demo Workspace</h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                You are currently signed in as a guest with the public demo account (<span className="text-indigo-300 font-semibold">{import.meta.env.VITE_DEMO_EMAIL || 'demo@demo.com'}</span>). Feel free to explore, create app workspaces, upload documents, and chat with AI agents. Please note that data created here is shared.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Upper header section */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">

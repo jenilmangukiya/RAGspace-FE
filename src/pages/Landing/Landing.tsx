@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -12,10 +12,12 @@ import {
   ChevronDown,
   Layers,
   Shield,
-  ArrowUpRight
+  ArrowUpRight,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { clsx } from 'clsx';
+import { toast } from 'sonner';
 import dashboardMockup from '../../assets/dashboard_mockup.png';
 import appMockup from '../../assets/app_mockup.png';
 
@@ -81,8 +83,28 @@ const FAQItem: React.FC<FAQItemProps> = ({ question, answer }) => {
 };
 
 export const Landing: React.FC = () => {
-  const { user } = useAuth();
+  const { user, login } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'chat'>('chat');
+  const [isDemoLoggingIn, setIsDemoLoggingIn] = useState(false);
+
+  const handleDemoLogin = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isDemoLoggingIn) return;
+    setIsDemoLoggingIn(true);
+    try {
+      await login(
+        import.meta.env.VITE_DEMO_EMAIL || 'demo@demo.com',
+        import.meta.env.VITE_DEMO_PASSWORD || 'demo@123'
+      );
+      toast.success('Welcome! Logged in as Demo User.');
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to login with demo credentials.');
+    } finally {
+      setIsDemoLoggingIn(false);
+    }
+  };
 
   return (
     <div className="min-h-screen w-full bg-zinc-950 text-zinc-100 overflow-x-hidden relative selection:bg-indigo-500/30">
@@ -124,6 +146,14 @@ export const Landing: React.FC = () => {
               </Link>
             ) : (
               <>
+                <button
+                  onClick={handleDemoLogin}
+                  disabled={isDemoLoggingIn}
+                  className="text-xs font-semibold text-indigo-450 hover:text-indigo-300 transition-colors cursor-pointer flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDemoLoggingIn && <Loader2 className="h-3 w-3 animate-spin" />}
+                  <span>Live Demo</span>
+                </button>
                 <Link to="/login" className="text-xs font-semibold text-zinc-400 hover:text-white transition-colors">
                   Sign In
                 </Link>
@@ -199,12 +229,14 @@ export const Landing: React.FC = () => {
                 <span>Deploy Free Workspace</span>
                 <ArrowRight className="h-4.5 w-4.5" />
               </Link>
-              <Link
-                to="/login"
-                className="rounded-xl border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/40 hover:border-zinc-700 px-6 py-3 text-xs sm:text-sm font-semibold text-zinc-300 hover:text-white transition-all cursor-pointer"
+              <button
+                onClick={handleDemoLogin}
+                disabled={isDemoLoggingIn}
+                className="rounded-xl border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/40 hover:border-zinc-700 px-6 py-3 text-xs sm:text-sm font-semibold text-zinc-300 hover:text-white transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Schedule Demo
-              </Link>
+                {isDemoLoggingIn && <Loader2 className="h-4.5 w-4.5 animate-spin text-indigo-400" />}
+                <span>Try Live Demo</span>
+              </button>
             </>
           )}
         </motion.div>

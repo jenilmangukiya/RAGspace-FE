@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -19,6 +19,24 @@ export const Login: React.FC = () => {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDemoLoggingIn, setIsDemoLoggingIn] = useState(false);
+
+  const handleDemoLogin = async () => {
+    if (isSubmitting || isDemoLoggingIn) return;
+    setIsDemoLoggingIn(true);
+    try {
+      await login(
+        import.meta.env.VITE_DEMO_EMAIL || 'demo@demo.com',
+        import.meta.env.VITE_DEMO_PASSWORD || 'demo@123'
+      );
+      toast.success('Logged in as Demo User successfully!');
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to sign in as guest.');
+    } finally {
+      setIsDemoLoggingIn(false);
+    }
+  };
 
   const {
     register,
@@ -99,11 +117,26 @@ export const Login: React.FC = () => {
         {/* Submit */}
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || isDemoLoggingIn}
           className="gradient-btn w-full flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-semibold mt-6 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
           <span>Sign In</span>
+        </button>
+
+        {/* Demo login option */}
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={isSubmitting || isDemoLoggingIn}
+          className="w-full flex items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/40 hover:bg-zinc-800/40 hover:border-zinc-700 py-2.5 text-sm font-semibold mt-3 text-indigo-400 hover:text-indigo-300 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isDemoLoggingIn ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          <span>Sign In as Guest / Demo</span>
         </button>
       </form>
 
