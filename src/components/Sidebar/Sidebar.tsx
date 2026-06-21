@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, Link, useNavigate, useParams } from 'react-router-dom';
-import { LayoutDashboard, Plus, Folder, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Plus, Folder, LogOut, X, Settings } from 'lucide-react';
 import { useApps } from '../../hooks/useApps';
 import { useAuth } from '../../hooks/useAuth';
 import { clsx } from 'clsx';
@@ -74,6 +74,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             >
               <LayoutDashboard className="h-4 w-4" />
               Dashboard
+            </NavLink>
+
+            <NavLink
+              to="/settings"
+              onClick={() => setIsOpen(false)}
+              className={({ isActive }) =>
+                clsx(
+                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-zinc-800 text-white'
+                    : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-white'
+                )
+              }
+            >
+              <Settings className="h-4 w-4" />
+              Settings
             </NavLink>
           </div>
 
