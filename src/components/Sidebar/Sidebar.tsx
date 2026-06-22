@@ -11,7 +11,7 @@ export interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
-  const { apps } = useApps();
+  const { apps, isLoading } = useApps();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { appId } = useParams();
@@ -107,7 +107,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             </div>
 
             <div className="space-y-1 max-h-[40vh] overflow-y-auto">
-              {apps.length === 0 ? (
+              {isLoading ? (
+                <div className="space-y-2 px-1">
+                  {[...Array(3)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 animate-pulse"
+                    >
+                      <div className="h-4 w-4 rounded-sm bg-zinc-800 shrink-0" />
+                      <div
+                        className={clsx(
+                          'h-3.5 rounded bg-zinc-800',
+                          i === 0 ? 'w-4/5' : i === 1 ? 'w-2/3' : 'w-1/2'
+                        )}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : apps.length === 0 ? (
                 <p className="px-3 py-2 text-xs text-zinc-600 italic">No apps yet</p>
               ) : (
                 apps.map((app) => (
