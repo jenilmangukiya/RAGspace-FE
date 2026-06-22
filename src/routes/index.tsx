@@ -6,6 +6,9 @@ import Signup from '../pages/Auth/Signup';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import AppDetails from '../pages/AppDetails/AppDetails';
 import Landing from '../pages/Landing/Landing';
+import Settings from '../pages/Settings/Settings';
+import Success from '../pages/Payment/Success';
+import Cancel from '../pages/Payment/Cancel';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 
 export const router = createBrowserRouter([
@@ -26,6 +29,9 @@ export const router = createBrowserRouter([
         children: [
           { path: '/dashboard', element: <Dashboard /> },
           { path: '/app/:appId', element: <AppDetails /> },
+          { path: '/settings', element: <Settings /> },
+          { path: '/payment/success', element: <Success /> },
+          { path: '/payment/cancel', element: <Cancel /> },
           { path: '*', element: <Navigate to="/dashboard" replace /> },
         ],
       },
