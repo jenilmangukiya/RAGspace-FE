@@ -1,0 +1,16 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /$
+Allow: /#features
+Allow: /#showcase
+Allow: /#pricing
+Allow: /#faq
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /settings
+Disallow: /settings/
+Disallow: /app/
+Disallow: /login
+Disallow: /signup
+
+Sitemap: https://ragspace.io/sitemap.xml
