@@ -3,6 +3,7 @@ import AuthLayout from '../layouts/AuthLayout';
 import DashboardLayout from '../layouts/DashboardLayout';
 import Login from '../pages/Auth/Login';
 import Signup from '../pages/Auth/Signup';
+import AuthCallback from '../pages/Auth/Callback';
 import Dashboard from '../pages/Dashboard/Dashboard';
 import AppDetails from '../pages/AppDetails/AppDetails';
 import Landing from '../pages/Landing/Landing';
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
       { path: '/login', element: <Login /> },
       { path: '/signup', element: <Signup /> },
     ],
+  },
+  {
+    path: '/auth/callback',
+    element: <AuthCallback />,
   },
   // Protected layouts
   {
